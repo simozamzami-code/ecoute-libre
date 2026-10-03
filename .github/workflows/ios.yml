@@ -50,6 +50,7 @@ jobs:
           set -euo pipefail
           xcodebuild test -project Sonora.xcodeproj -scheme Sonora \
             -skip-testing:SonoraTests/YouTubeNetworkTests \
+            -parallel-testing-enabled NO \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             -derivedDataPath build/simulator -resultBundlePath build/tests.xcresult \
             CODE_SIGNING_ALLOWED=NO | tee build-tests.log
@@ -58,6 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           xcrun simctl bootstatus "$SIMULATOR_ID" -b
+          xcrun simctl install "$SIMULATOR_ID" build/simulator/Build/Products/Debug-iphonesimulator/Sonora.app
           xcrun simctl launch "$SIMULATOR_ID" fr.sonora.audio.ios
           sleep 3
           xcrun simctl io "$SIMULATOR_ID" screenshot build/sonora-simulator.png
@@ -93,10 +95,12 @@ jobs:
 
       - name: Vérifier l’accès YouTube depuis le Mac distant
         continue-on-error: true
+        timeout-minutes: 5
         run: |
           set -euo pipefail
           xcodebuild test -project Sonora.xcodeproj -scheme Sonora \
             -only-testing:SonoraTests/YouTubeNetworkTests \
+            -parallel-testing-enabled NO \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             -derivedDataPath build/simulator -resultBundlePath build/network.xcresult \
             CODE_SIGNING_ALLOWED=NO | tee build-network.log

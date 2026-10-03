@@ -61,17 +61,19 @@ actor YouTubeRepository {
     }
 
     func video(_ id: String) async throws -> Track {
-        let response = try await VideoInfosResponse.sendThrowingRequest(youtubeModel: model(), data: [.query: id], useCookies: false)
+        let details = try await VideoInfosWithDownloadFormatsResponse.sendThrowingRequest(youtubeModel: model(), data: [.query: id], useCookies: false)
+        let response = details.videoInfos
         return Track(id: id, title: response.title ?? "Vidéo YouTube", artist: response.channel?.name ?? "YouTube", artwork: response.thumbnails.last?.url, duration: nil)
     }
 
     func audio(_ id: String, refresh: Bool = false) async throws -> AudioSource {
         if !refresh, let cached = audioCache[id], cached.expires.timeIntervalSinceNow > 120 { return cached }
-        let response = try await VideoInfosResponse.sendThrowingRequest(youtubeModel: model(), data: [.query: id], useCookies: false)
+        let details = try await VideoInfosWithDownloadFormatsResponse.sendThrowingRequest(youtubeModel: model(), data: [.query: id], useCookies: false)
+        let response = details.videoInfos
         try Task.checkCancellation()
         guard response.isLive != true else { throw SonoraError.liveUnsupported }
         // Select only AAC/M4A audio. A combined video stream is never a fallback.
-        let formats = response.downloadFormats.compactMap { $0 as? AudioOnlyFormat }
+        let formats = details.downloadFormats.compactMap { $0 as? AudioOnlyFormat }
             .filter { $0.mimeType == "audio/mp4" && ($0.codec == nil || $0.codec?.hasPrefix("mp4a") == true) }
             .sorted { lhs, rhs in
                 let leftOriginal = lhs.formatLocaleInfos?.isAutoDubbed != true
@@ -82,7 +84,12 @@ actor YouTubeRepository {
         for format in formats {
             var candidate: any AdaptiveDownloadFormat = format
             do {
-                if let player = response.player { try player.processDownloadFormatURL(item: &candidate) }
+                let needsProcessing = candidate.signatureCipher != nil || candidate.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }?.queryItems?.contains { $0.name == "n" } == true
+                if needsProcessing {
+                    let watch = try await VideoInfosResponse.sendThrowingRequest(youtubeModel: model(), data: [.query: id], useCookies: false)
+                    guard let player = watch.player else { continue }
+                    try player.processDownloadFormatURL(item: &candidate)
+                }
                 guard let url = candidate.url, url.scheme == "https" else { continue }
                 let expiry = min(response.videoURLsExpireAt ?? Date().addingTimeInterval(1200), Date().addingTimeInterval(1200))
                 let result = AudioSource(url: url, expires: expiry)
