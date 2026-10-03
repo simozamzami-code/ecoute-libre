@@ -4,7 +4,13 @@ Version native SwiftUI pour iOS 16 ou plus récent. Elle reprend la recherche Yo
 
 ## État de la livraison
 
-Le code et la compilation GitHub sont préparés. **Aucun fichier IPA n’a encore été compilé, signé ou installé sur un iPhone.** La session de développement actuelle fonctionne sous Windows, sans Xcode. Les tests Swift et la vérification de l’interface doivent être exécutés sur le Mac distant avant de considérer cette version comme utilisable.
+**Le fichier `Sonora-a-signer.ipa` a été compilé pour un vrai iPhone le 3 octobre 2026.** Il est non signé et nécessite AltStore Classic pour l’installation depuis Windows. Aucun Mac personnel n’est nécessaire.
+
+La [compilation GitHub](https://github.com/simozamzami-code/ecoute-libre/actions/runs/37127034927) utilise le commit `77965906c42e5f8ca7254b9e05c0e84844cf684c`. Les quatre tests de base ont réussi : liens YouTube, rejet des liens invalides, conservation des favoris/playlists et affichage des durées. L’archive IPA a été téléchargée et son empreinte vérifiée.
+
+Un contrôle réseau depuis le PC a obtenu un flux AAC audio/mp4 et 1 024 octets avec une réponse HTTP 206. Ce contrôle utilise la même requête mobile YouTube que l’application, mais ne remplace pas une écoute dans AVPlayer sur iPhone. La capture d’écran et les tests réseau supplémentaires du simulateur GitHub ont atteint leur limite de temps ; ils ne sont pas validés, malgré le statut global vert du workflow. L’installation, l’écoute écran verrouillé et l’enchaînement restent à vérifier sur un vrai iPhone.
+
+Empreinte SHA-256 de l’IPA : `fabf1b5ef35ef457e67787b25dfbcb34e746d73f6f7aa6ba1af3b6aa6910fdb6`.
 
 ## Fonctionnement prévu
 

@@ -1,23 +1,59 @@
 {
-  "swift_files_parsed": 8,
-  "syntax_findings": [],
-  "yaml_valid": true,
-  "background_audio_declared": true,
-  "xcode_compilation_executed": false,
-  "ios_tests_executed": false,
-  "ipa_generated": false,
+  "build_commit": "77965906c42e5f8ca7254b9e05c0e84844cf684c",
+  "build_url": "https://github.com/simozamzami-code/ecoute-libre/actions/runs/37127034927",
+  "xcode_compilation_executed": true,
+  "ios_tests_executed": true,
+  "unit_tests_passed": 4,
+  "ipa_generated": true,
+  "ipa_signed": false,
   "phone_installation_tested": false,
+  "lock_screen_audio_tested_on_device": false,
+  "simulator_screenshot": "timed_out",
+  "simulator_network_tests": "timed_out_before_test_execution",
+  "windows_audio_endpoint_probe": {
+    "playability": "OK",
+    "aac_formats": 4,
+    "hls_available": false,
+    "audio_http": 206,
+    "audio_mime": "audio/mp4",
+    "bytes_read": 1024
+  },
+  "binary_validation": {
+    "ipa_bytes": 1483368,
+    "ipa_sha256": "fabf1b5ef35ef457e67787b25dfbcb34e746d73f6f7aa6ba1af3b6aa6910fdb6",
+    "archive_integrity": null,
+    "bundle_id": "fr.sonora.audio.ios",
+    "version": "1.0",
+    "minimum_ios": "16.0",
+    "supported_platforms": [
+      "iPhoneOS"
+    ],
+    "background_modes": [
+      "audio"
+    ],
+    "macho_header": [
+      4277009103,
+      16777228,
+      0,
+      2,
+      53,
+      6488,
+      2162821,
+      0
+    ],
+    "has_embedded_profile": false,
+    "file_count": 12
+  },
   "dependency_revision": "6532af39da4c1612b0a1af603792419d8fb0e67f",
-  "initial_swift_syntax_check": "8 Swift files parsed without syntax errors",
-  "latest_validation": "Small playback-state changes reviewed manually; repeat parser run blocked by local parser-folder access permissions",
   "source_sha256": {
-    "App/AudioPlayer.swift": "ed6c09f9156b876e506f4c8ba0f39b6f33826d2b435c4df51aaf286379b214ea",
+    "App/AudioPlayer.swift": "09f31c3b5fa6daec28008c4ec3bb9bfd981ded64207210eabc7c69fd9de4e934",
     "App/CatalogModel.swift": "59c6467fa2b07a17eef3ef4a198505b694188f23016c3abae802f0d411785151",
     "App/ContentView.swift": "602a06b40b13ba9a8a94a8e477d023242ca84f280b266e673dbf0092b1210822",
     "App/LibraryStore.swift": "8b014490503761246a767a2a2f268fe58388dae62a49c86f6115544a55d52c2a",
     "App/Models.swift": "194d1e0745605fce3e65328b79647c165760e01eba1331a7cd6f17d2c81b9a5d",
     "App/SonoraApp.swift": "5b276e9104fd167de0be71c1eb0603dae052042e89074adaddfb17ddb4ae7552",
-    "App/YouTubeRepository.swift": "b9532d9cfd624cbe101a066284f5147ea3c9fec527e1ada29e2c1244ba9ce307",
-    "Tests/SonoraTests.swift": "da311207167e52ea15d450e3006d3bf879e557adb55b4d841870b8f664682527"
+    "App/YouTubeRepository.swift": "3857b010a499c1d20c97a14938376c1b1973cab3bdc72283390c887914c21951",
+    "Tests/SonoraTests.swift": "da311207167e52ea15d450e3006d3bf879e557adb55b4d841870b8f664682527",
+    "Tests/YouTubeNetworkTests.swift": "deff93be565aaf58b36fd8801a6f0ce271116fdbdb1284e0a409b5dd52664b9d"
   }
 }
