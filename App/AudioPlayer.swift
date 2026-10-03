@@ -63,8 +63,8 @@ final class AudioPlayer: ObservableObject {
         })
         notifications.append(NotificationCenter.default.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in
-                guard let self, current != nil else { return }
-                load(index: index, autoplay: wantsPlayback, position: elapsed, refresh: true)
+                guard let self, self.current != nil else { return }
+                self.load(index: self.index, autoplay: self.wantsPlayback, position: self.elapsed, refresh: true)
             }
         })
         configureCommands()
@@ -178,12 +178,12 @@ final class AudioPlayer: ObservableObject {
             let status = observed.status
             let observedID = ObjectIdentifier(observed)
             Task { @MainActor in
-                guard let self, let active = player.currentItem, ObjectIdentifier(active) == observedID else { return }
+                guard let self, let active = self.player.currentItem, ObjectIdentifier(active) == observedID else { return }
                 if status == .failed {
-                    isLoading = false; wantsPlayback = false; player.pause()
-                    error = "Le flux audio a expiré ou est indisponible. Touche Réessayer."
-                } else if status == .readyToPlay { isLoading = false }
-                updateProgress(); updatePlaybackState()
+                    self.isLoading = false; self.wantsPlayback = false; self.player.pause()
+                    self.error = "Le flux audio a expiré ou est indisponible. Touche Réessayer."
+                } else if status == .readyToPlay { self.isLoading = false }
+                self.updateProgress(); self.updatePlaybackState()
             }
         }
         let activeIDs = Set(player.items().map(ObjectIdentifier.init))
