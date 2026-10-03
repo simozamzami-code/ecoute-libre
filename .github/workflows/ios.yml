@@ -1,0 +1,103 @@
+name: Construire Sonora pour iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'App/**'
+      - 'Tests/**'
+      - 'project.yml'
+      - '.github/workflows/ios.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sonora-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Récupérer le projet
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Préparer Xcode
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi
+          xcodegen generate
+          xcodebuild -resolvePackageDependencies -project Sonora.xcodeproj -scheme Sonora
+
+      - name: Choisir un simulateur iPhone
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, subprocess
+          devices = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', 'available', '-j']))['devices']
+          candidates = [d for runtime, values in devices.items() if 'iOS' in runtime for d in values if 'iPhone' in d['name'] and d.get('isAvailable')]
+          if not candidates:
+              raise SystemExit('Aucun simulateur iPhone disponible')
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('SIMULATOR_ID=' + candidates[0]['udid'] + '\n')
+          PY
+
+      - name: Compiler et tester sur simulateur
+        run: |
+          set -euo pipefail
+          xcodebuild test -project Sonora.xcodeproj -scheme Sonora \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
+            -derivedDataPath build/simulator -resultBundlePath build/tests.xcresult \
+            CODE_SIGNING_ALLOWED=NO | tee build-tests.log
+
+      - name: Capturer l’écran de l’application
+        run: |
+          set -euo pipefail
+          xcrun simctl bootstatus "$SIMULATOR_ID" -b
+          xcrun simctl launch "$SIMULATOR_ID" fr.sonora.audio.ios
+          sleep 3
+          xcrun simctl io "$SIMULATOR_ID" screenshot build/sonora-simulator.png
+
+      - name: Compiler pour un vrai iPhone
+        run: |
+          set -euo pipefail
+          xcodebuild build -project Sonora.xcodeproj -scheme Sonora \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/device CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            | tee build-device.log
+
+      - name: Créer le fichier IPA à signer
+        run: |
+          set -euo pipefail
+          mkdir -p build/package/Payload
+          ditto build/device/Build/Products/Release-iphoneos/Sonora.app build/package/Payload/Sonora.app
+          cd build/package
+          ditto -c -k --sequesterRsrc --keepParent Payload ../Sonora-a-signer.ipa
+          cd ../..
+          shasum -a 256 build/Sonora-a-signer.ipa > build/SHA256.txt
+
+      - name: Livrer Sonora
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Sonora-iPhone
+          path: |
+            build/Sonora-a-signer.ipa
+            build/SHA256.txt
+            build/sonora-simulator.png
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Conserver les résultats des tests
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Sonora-tests
+          path: |
+            build/tests.xcresult
+            build-tests.log
+            build-device.log
+          retention-days: 7
+          if-no-files-found: ignore

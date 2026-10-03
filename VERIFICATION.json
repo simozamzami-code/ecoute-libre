@@ -1,0 +1,23 @@
+{
+  "swift_files_parsed": 8,
+  "syntax_findings": [],
+  "yaml_valid": true,
+  "background_audio_declared": true,
+  "xcode_compilation_executed": false,
+  "ios_tests_executed": false,
+  "ipa_generated": false,
+  "phone_installation_tested": false,
+  "dependency_revision": "6532af39da4c1612b0a1af603792419d8fb0e67f",
+  "initial_swift_syntax_check": "8 Swift files parsed without syntax errors",
+  "latest_validation": "Small playback-state changes reviewed manually; repeat parser run blocked by local parser-folder access permissions",
+  "source_sha256": {
+    "App/AudioPlayer.swift": "ed6c09f9156b876e506f4c8ba0f39b6f33826d2b435c4df51aaf286379b214ea",
+    "App/CatalogModel.swift": "59c6467fa2b07a17eef3ef4a198505b694188f23016c3abae802f0d411785151",
+    "App/ContentView.swift": "602a06b40b13ba9a8a94a8e477d023242ca84f280b266e673dbf0092b1210822",
+    "App/LibraryStore.swift": "8b014490503761246a767a2a2f268fe58388dae62a49c86f6115544a55d52c2a",
+    "App/Models.swift": "194d1e0745605fce3e65328b79647c165760e01eba1331a7cd6f17d2c81b9a5d",
+    "App/SonoraApp.swift": "5b276e9104fd167de0be71c1eb0603dae052042e89074adaddfb17ddb4ae7552",
+    "App/YouTubeRepository.swift": "b9532d9cfd624cbe101a066284f5147ea3c9fec527e1ada29e2c1244ba9ce307",
+    "Tests/SonoraTests.swift": "da311207167e52ea15d450e3006d3bf879e557adb55b4d841870b8f664682527"
+  }
+}
