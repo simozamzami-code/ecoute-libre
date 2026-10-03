@@ -49,6 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           xcodebuild test -project Sonora.xcodeproj -scheme Sonora \
+            -skip-testing:SonoraTests/YouTubeNetworkTests \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             -derivedDataPath build/simulator -resultBundlePath build/tests.xcresult \
             CODE_SIGNING_ALLOWED=NO | tee build-tests.log
@@ -90,6 +91,16 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+      - name: Vérifier l’accès YouTube depuis le Mac distant
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          xcodebuild test -project Sonora.xcodeproj -scheme Sonora \
+            -only-testing:SonoraTests/YouTubeNetworkTests \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
+            -derivedDataPath build/simulator -resultBundlePath build/network.xcresult \
+            CODE_SIGNING_ALLOWED=NO | tee build-network.log
+
       - name: Conserver les résultats des tests
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -99,5 +110,7 @@ jobs:
             build/tests.xcresult
             build-tests.log
             build-device.log
+            build-network.log
+            build/network.xcresult
           retention-days: 7
           if-no-files-found: ignore
