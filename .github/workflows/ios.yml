@@ -56,6 +56,8 @@ jobs:
             CODE_SIGNING_ALLOWED=NO | tee build-tests.log
 
       - name: Capturer l’écran de l’application
+        continue-on-error: true
+        timeout-minutes: 2
         run: |
           set -euo pipefail
           xcrun simctl bootstatus "$SIMULATOR_ID" -b
