@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var showPlayer = false
     @State private var showInfo = false
     @State private var pendingRemoval: SavedPlaylist?
+    @State private var clearHistory = false
     @FocusState private var searchFocused: Bool
 
     private var tracks: [Track] { tab == .favorites ? library.favorites : catalog.page?.tracks ?? [] }
@@ -36,7 +37,7 @@ struct ContentView: View {
             }
             HStack(spacing: 5) {
                 ForEach(Tab.allCases, id: \.self) { value in
-                    Button { tab = value; searchFocused = false } label: {
+                    Button { tab = value; searchFocused = false; if value == .search { catalog.home(library: library) } } label: {
                         Text(value.rawValue).font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity).padding(.vertical, 12)
                             .foregroundStyle(tab == value ? Color.sonoraBackground : Color.sonoraMuted)
                             .background(tab == value ? Color.sonoraGreen : .clear, in: Capsule())
@@ -68,6 +69,11 @@ struct ContentView: View {
         .foregroundStyle(Color.sonoraInk)
         .padding(.horizontal, 20).padding(.top, 12).padding(.bottom, 8)
         .background(Color.sonoraBackground.ignoresSafeArea())
+        .task { if catalog.page == nil && catalog.isHome { catalog.home(library: library) } }
+        .alert("Effacer l’historique des recherches ?", isPresented: $clearHistory) {
+            Button("Effacer", role: .destructive) { library.clearSearches(); catalog.home(library: library) }
+            Button("Annuler", role: .cancel) { }
+        }
         .sheet(isPresented: $showPlayer) { PlayerSheet().presentationDragIndicator(.visible) }
         .sheet(isPresented: $showImport) { importSheet }
         .sheet(isPresented: $showInfo) { aboutSheet }
@@ -82,15 +88,19 @@ struct ContentView: View {
     }
 
     @ViewBuilder private var tracksContent: some View {
+        if tab == .search && catalog.isHome {
+            historyContent
+        }
         VStack(alignment: .leading, spacing: 5) {
             Text(tab == .favorites ? "Tes coups de cœur." : catalog.page?.title ?? "À ton rythme.")
                 .font(.system(size: 29, weight: .bold, design: .rounded))
-            Text(tab == .favorites ? "Les titres que tu veux retrouver." : "Tout ce que tu aimes. Juste le son.")
+            Text(tab == .favorites ? "Les titres que tu veux retrouver." : catalog.isHome ? (library.searches.first.map { "Inspirés de « \($0) » · Audio seul" } ?? "Une sélection musicale pour commencer · Audio seul") : "Tout ce que tu aimes. Juste le son.")
                 .font(.subheadline).foregroundStyle(Color.sonoraMuted)
         }
         if tab == .search {
             if catalog.isLoading { HStack { ProgressView(); Text("On cherche pour toi…").font(.subheadline) }.foregroundStyle(Color.sonoraGreen) }
             if let error = catalog.error { message(error, error: true) }
+            if catalog.isHome && !catalog.isLoading { Button("Actualiser les suggestions") { catalog.home(library: library) } }
         }
         if tracks.isEmpty && !catalog.isLoading {
             VStack(spacing: 16) {
@@ -115,6 +125,35 @@ struct ContentView: View {
                     .background(Color.sonoraCard, in: RoundedRectangle(cornerRadius: 14)).disabled(catalog.isLoading)
             }
         }
+    }
+
+    private var historyContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Recherches récentes").font(.headline)
+                Spacer()
+                if !library.searches.isEmpty { Button("Effacer") { clearHistory = true }.font(.caption) }
+            }
+            if library.searches.isEmpty {
+                Text("Tes recherches apparaîtront ici.").font(.subheadline).foregroundStyle(Color.sonoraMuted)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(library.searches, id: \.self) { value in
+                            HStack(spacing: 6) {
+                                Button { catalog.query = value; submit() } label: {
+                                    Label(value, systemImage: "clock.arrow.circlepath").lineLimit(1)
+                                }
+                                Button { library.removeSearch(value); catalog.home(library: library) } label: {
+                                    Image(systemName: "xmark").padding(8)
+                                }.accessibilityLabel("Supprimer la recherche \(value)")
+                            }.font(.subheadline).padding(.leading, 12).padding(.vertical, 5)
+                                .background(Color.sonoraCard, in: Capsule())
+                        }
+                    }
+                }
+            }
+        }.padding(.bottom, 12)
     }
 
     private var playlistsContent: some View {

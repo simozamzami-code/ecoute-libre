@@ -2,6 +2,29 @@ import XCTest
 @testable import Sonora
 
 final class SonoraTests: XCTestCase {
+    func testSearchHistoryPersistsDeduplicatesAndClears() async {
+        await MainActor.run {
+            let suite = "sonora.history.\(UUID().uuidString)"
+            let defaults = UserDefaults(suiteName: suite)!
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let library = LibraryStore(defaults: defaults)
+            library.rememberSearch("  Daft Punk  ")
+            library.rememberSearch("Justice")
+            library.rememberSearch("daft punk")
+            XCTAssertEqual(LibraryStore(defaults: defaults).searches, ["daft punk", "Justice"])
+            for index in 0..<25 { library.rememberSearch("Artiste \(index)") }
+            XCTAssertEqual(library.searches.count, 20)
+            XCTAssertEqual(library.searches.first, "Artiste 24")
+            library.removeSearch("Artiste 24")
+            XCTAssertEqual(LibraryStore(defaults: defaults).searches.first, "Artiste 23")
+            library.cacheSuggestions([Track(id: "test", title: "Clip", artist: "Artiste", artwork: nil, duration: 5)])
+            XCTAssertEqual(LibraryStore(defaults: defaults).suggestions.count, 1)
+            library.clearSearches()
+            let restored = LibraryStore(defaults: defaults)
+            XCTAssertTrue(restored.searches.isEmpty)
+            XCTAssertTrue(restored.suggestions.isEmpty)
+        }
+    }
     func testYouTubeLinksAndSearch() throws {
         XCTAssertEqual(try YouTubeInput.parse("  Daft Punk  "), .search("Daft Punk"))
         XCTAssertEqual(try YouTubeInput.parse("https://youtu.be/jNQXAC9IVRw?si=test"), .video("jNQXAC9IVRw"))

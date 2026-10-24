@@ -7,10 +7,32 @@ final class CatalogModel: ObservableObject {
     @Published private(set) var page: CatalogPage?
     @Published private(set) var isLoading = false
     @Published var error: String?
+    @Published private(set) var isHome = true
     private var request: Task<Void, Never>?
     private var requestID = UUID()
 
+    func home(library: LibraryStore) {
+        request?.cancel()
+        let id = UUID(); requestID = id
+        isHome = true; query = ""; error = nil
+        page = CatalogPage(title: "Clips à découvrir", tracks: library.suggestions)
+        isLoading = true
+        let seed = library.searches.first ?? "clips musicaux officiels"
+        request = Task { [weak self] in
+            guard let self else { return }
+            defer { if requestID == id { isLoading = false } }
+            do {
+                let result = try await YouTubeRepository.shared.search(seed)
+                guard !Task.isCancelled, requestID == id else { return }
+                library.cacheSuggestions(result.tracks)
+                page = CatalogPage(title: "Clips à découvrir", tracks: library.suggestions)
+            } catch is CancellationError { }
+            catch { if requestID == id { self.error = "Suggestions indisponibles pour le moment. Tu peux relancer une recherche ou réessayer." } }
+        }
+    }
+
     func submit(_ text: String, library: LibraryStore, requirePlaylist: Bool = false) {
+        isHome = false
         request?.cancel()
         let id = UUID(); requestID = id
         request = Task { [weak self] in
@@ -24,12 +46,15 @@ final class CatalogModel: ObservableObject {
                 }
                 let value: CatalogPage
                 switch input {
-                case .search(let query): value = try await YouTubeRepository.shared.search(query)
+                case .search(let query):
+                    library.rememberSearch(query)
+                    value = try await YouTubeRepository.shared.search(query)
                 case .playlist(let playlist): value = try await YouTubeRepository.shared.playlist(playlist)
                 case .video(let video): value = CatalogPage(title: "Prêt à écouter", tracks: [try await YouTubeRepository.shared.video(video)])
                 }
                 guard !Task.isCancelled, requestID == id else { return }
                 page = value
+                if case .search = input { library.cacheSuggestions(value.tracks) }
                 if let playlistID = value.playlistID { library.remember(SavedPlaylist(id: playlistID, title: value.title)) }
             } catch is CancellationError { }
             catch {
