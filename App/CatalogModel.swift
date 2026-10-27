@@ -22,10 +22,16 @@ final class CatalogModel: ObservableObject {
             guard let self else { return }
             defer { if requestID == id { isLoading = false } }
             do {
-                let result = try await YouTubeRepository.shared.search(seed)
-                guard !Task.isCancelled, requestID == id else { return }
-                library.cacheSuggestions(result.tracks)
-                page = CatalogPage(title: "Clips à découvrir", tracks: library.suggestions)
+                var result = try await YouTubeRepository.shared.search(seed)
+                for batch in 0..<3 {
+                    guard !Task.isCancelled, requestID == id else { return }
+                    var seen = Set<String>()
+                    let unique = result.tracks.filter { seen.insert($0.id).inserted }
+                    library.cacheSuggestions(unique)
+                    page = CatalogPage(title: "Clips à découvrir", tracks: library.suggestions)
+                    if unique.count >= 60 || result.cursor == nil || batch == 2 { break }
+                    result = try await YouTubeRepository.shared.more(result)
+                }
             } catch is CancellationError { }
             catch { if requestID == id { self.error = "Suggestions indisponibles pour le moment. Tu peux relancer une recherche ou réessayer." } }
         }

@@ -2,11 +2,11 @@ import SwiftUI
 import AVKit
 
 extension Color {
-    static let sonoraBackground = Color(red: 16/255, green: 19/255, blue: 16/255)
-    static let sonoraCard = Color(red: 30/255, green: 35/255, blue: 29/255)
-    static let sonoraGreen = Color(red: 198/255, green: 243/255, blue: 106/255)
-    static let sonoraInk = Color(red: 243/255, green: 245/255, blue: 234/255)
-    static let sonoraMuted = Color(red: 155/255, green: 164/255, blue: 147/255)
+    static let sonoraBackground = Color(red: 16/255, green: 17/255, blue: 20/255)
+    static let sonoraCard = Color(red: 30/255, green: 31/255, blue: 35/255)
+    static let sonoraGreen = Color(red: 255/255, green: 190/255, blue: 48/255)
+    static let sonoraInk = Color(red: 249/255, green: 249/255, blue: 250/255)
+    static let sonoraMuted = Color(red: 171/255, green: 173/255, blue: 180/255)
 }
 
 struct ContentView: View {
@@ -25,11 +25,11 @@ struct ContentView: View {
 
     private var tracks: [Track] { tab == .favorites ? library.favorites : catalog.page?.tracks ?? [] }
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 12) {
             HStack(alignment: .center) {
                 HStack(spacing: 10) {
-                    Image(systemName: "waveform").foregroundStyle(Color.sonoraGreen).font(.title2.bold())
-                    Text("sonora").font(.system(size: 34, weight: .bold, design: .rounded)).tracking(-1.5)
+                    Image("BrandLogo").resizable().scaledToFit().frame(width: 42, height: 42).accessibilityLabel("Logo Sonora MZ")
+                    Text("sonora").font(.system(size: 27, weight: .bold, design: .rounded)).tracking(-1.5)
                 }
                 Spacer()
                 Button { showInfo = true } label: { Image(systemName: "info.circle").font(.title3).foregroundStyle(Color.sonoraMuted) }
@@ -239,7 +239,7 @@ struct ContentView: View {
                     Text("Les publicités ajoutées par YouTube ne sont pas chargées. Les sponsors présents dans l’enregistrement restent audibles. Les directs et playlists privées ne sont pas pris en charge.").font(.subheadline).foregroundStyle(Color.sonoraMuted)
                     Text("Accès YouTube non officiel : une évolution du service peut nécessiter une mise à jour de Sonora.").font(.footnote).foregroundStyle(Color.sonoraMuted)
                     Link("YouTubeKit · bibliothèque open source", destination: URL(string: "https://github.com/b5i/YouTubeKit")!)
-                    Text("Version de test 0.1.0").font(.caption).foregroundStyle(Color.sonoraMuted)
+                    Text("Version 1.2.0").font(.caption).foregroundStyle(Color.sonoraMuted)
                 }.frame(maxWidth: .infinity, alignment: .leading).padding(24)
             }.background(Color.sonoraBackground).toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fermer") { showInfo = false } } }
         }
@@ -332,7 +332,7 @@ struct PlayerSheet: View {
                 }.padding(26)
             }.background(Color.sonoraBackground).foregroundStyle(Color.sonoraInk)
                 .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fermer") { dismiss() } } }
-                .sheet(isPresented: $showQueue) {
+                .fullScreenCover(isPresented: $showQueue) {
                     NavigationStack {
                         List(Array(player.queue.enumerated()), id: \.offset) { position, track in
                             Button { player.select(position); showQueue = false } label: {

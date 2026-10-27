@@ -29,7 +29,7 @@ final class LibraryStore: ObservableObject {
     }
     func removeSearch(_ text: String) { searches.removeAll { $0 == text }; suggestions = []; save() }
     func clearSearches() { searches = []; suggestions = []; save() }
-    func cacheSuggestions(_ tracks: [Track]) { suggestions = Array(tracks.prefix(12)); save() }
+    func cacheSuggestions(_ tracks: [Track]) { suggestions = Array(tracks.prefix(60)); save() }
     func toggle(_ track: Track) {
         if contains(track) { favorites.removeAll { $0.id == track.id } } else { favorites.insert(track, at: 0) }
         save()
