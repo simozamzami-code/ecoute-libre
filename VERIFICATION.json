@@ -1,15 +1,15 @@
 {
-  "build_commit": "77965906c42e5f8ca7254b9e05c0e84844cf684c",
-  "build_url": "https://github.com/simozamzami-code/ecoute-libre/actions/runs/37127034927",
-  "xcode_compilation_executed": true,
-  "ios_tests_executed": true,
-  "unit_tests_passed": 4,
+  "version": "1.2.0",
+  "build": 3,
+  "build_commit": "a11f5f21aabe6bf924273451804f96d56c8bb7ee",
+  "build_url": "https://github.com/simozamzami-code/ecoute-libre/actions/runs/40593442018",
   "ipa_generated": true,
   "ipa_signed": false,
-  "phone_installation_tested": false,
-  "lock_screen_audio_tested_on_device": false,
-  "simulator_screenshot": "timed_out",
-  "simulator_network_tests": "timed_out_before_test_execution",
+  "ipa_sha256": "6c7ad2f417b2e6bb142aacae2bd1e7501485aaded869c9e152d7bc2c1a9f3df7",
+  "unit_tests_passed": 5,
+  "live_search_test": "passed",
+  "live_playlist_test": "passed",
+  "live_audio_test_on_github": "failed: YouTube requires login for streaming information",
   "windows_audio_endpoint_probe": {
     "playability": "OK",
     "aac_formats": 4,
@@ -18,42 +18,18 @@
     "audio_mime": "audio/mp4",
     "bytes_read": 1024
   },
-  "binary_validation": {
-    "ipa_bytes": 1483368,
-    "ipa_sha256": "fabf1b5ef35ef457e67787b25dfbcb34e746d73f6f7aa6ba1af3b6aa6910fdb6",
-    "archive_integrity": null,
-    "bundle_id": "fr.sonora.audio.ios",
-    "version": "1.0",
-    "minimum_ios": "16.0",
-    "supported_platforms": [
-      "iPhoneOS"
-    ],
-    "background_modes": [
-      "audio"
-    ],
-    "macho_header": [
-      4277009103,
-      16777228,
-      0,
-      2,
-      53,
-      6488,
-      2162821,
-      0
-    ],
-    "has_embedded_profile": false,
-    "file_count": 12
-  },
-  "dependency_revision": "6532af39da4c1612b0a1af603792419d8fb0e67f",
+  "simulator_screenshot_reviewed": true,
+  "device_installation_tested": false,
+  "lock_screen_audio_tested_on_device": false,
   "source_sha256": {
     "App/AudioPlayer.swift": "09f31c3b5fa6daec28008c4ec3bb9bfd981ded64207210eabc7c69fd9de4e934",
-    "App/CatalogModel.swift": "59c6467fa2b07a17eef3ef4a198505b694188f23016c3abae802f0d411785151",
-    "App/ContentView.swift": "602a06b40b13ba9a8a94a8e477d023242ca84f280b266e673dbf0092b1210822",
-    "App/LibraryStore.swift": "8b014490503761246a767a2a2f268fe58388dae62a49c86f6115544a55d52c2a",
+    "App/CatalogModel.swift": "d9c5b69a1929bc244eff3ff4a40a5c2f0df64a1143a02740227f282e8d25b124",
+    "App/ContentView.swift": "480bebee2a662cdb2ca221c320dac2f068992c371a1505fec9c310495643cbf7",
+    "App/LibraryStore.swift": "0e8caf938e5ad05d6870fa69bec1a010e309b430f641ce77a69c6b8966aa9fa4",
     "App/Models.swift": "194d1e0745605fce3e65328b79647c165760e01eba1331a7cd6f17d2c81b9a5d",
     "App/SonoraApp.swift": "5b276e9104fd167de0be71c1eb0603dae052042e89074adaddfb17ddb4ae7552",
     "App/YouTubeRepository.swift": "3857b010a499c1d20c97a14938376c1b1973cab3bdc72283390c887914c21951",
-    "Tests/SonoraTests.swift": "da311207167e52ea15d450e3006d3bf879e557adb55b4d841870b8f664682527",
+    "Tests/SonoraTests.swift": "67263be9aa2712a43d0e61fc1bbc12e1f20d4c3a57e4667e2b214feaf6892fc3",
     "Tests/YouTubeNetworkTests.swift": "deff93be565aaf58b36fd8801a6f0ce271116fdbdb1284e0a409b5dd52664b9d"
   }
 }
